@@ -14,6 +14,12 @@ def save_message(message, db):
     if message.reply_to_message is not None:
         replied = message.reply_to_message.message_id
 
+    length = None
+    if message.text is not None:
+        length = len(message.text)
+    elif message.caption is not None:
+        length = len(message.caption)
+
     vote = None
     if message.text == '+':
         vote = '+'
@@ -25,7 +31,7 @@ def save_message(message, db):
         'chat_id': message.chat_id,
         'user_id': message.from_user.id,
         'replied': replied,
-        'length': len(message.text),
+        'length': length,
         'vote': vote,
     }
 
@@ -51,12 +57,13 @@ def save(bot, update):
 
 def run():
     updater = Updater(TOKEN)
-    updater.dispatcher.add_handler(
-        MessageHandler(Filters.text, save)
-    )
 
-    for handler in HANDLERS:
-        updater.dispatcher.add_handler(handler)
+    handlers = HANDLERS + [
+        MessageHandler(Filters.all, save),  # must be last
+    ]
+
+    for h in handlers:
+        updater.dispatcher.add_handler(h)
 
     updater.start_polling()
     updater.idle()
