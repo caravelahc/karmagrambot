@@ -27,6 +27,7 @@ def save_message(message, db):
         vote = '-'
 
     new_row = {
+        'timestamp': message.date,
         'message_id': message.message_id,
         'chat_id': message.chat_id,
         'user_id': message.from_user.id,
