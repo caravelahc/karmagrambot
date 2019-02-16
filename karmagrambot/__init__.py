@@ -26,7 +26,7 @@ def save_message(message, db):
     elif message.text == '-':
         vote = '-'
 
-    row = {
+    new_row = {
         'message_id': message.message_id,
         'chat_id': message.chat_id,
         'user_id': message.from_user.id,
@@ -35,7 +35,7 @@ def save_message(message, db):
         'vote': vote,
     }
 
-    db['messages'].insert(row)
+    db['messages'].upsert(new_row, keys=['message_id', 'chat_id'])
 
 
 def save_user(user, db):
