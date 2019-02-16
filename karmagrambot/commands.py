@@ -12,7 +12,7 @@ def average_length(bot, update):
         average = average_message_length(user_id, chat_id)
         response = f'{average:.3}'
     except ZeroDivisionError:
-        response = 'You have zero messages on record.'
+        response = '0.0'
 
     message.reply_text(response)
 
