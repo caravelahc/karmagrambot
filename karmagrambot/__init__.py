@@ -1,7 +1,7 @@
 import dataset
 import logging
 
-from telegram.ext import Updater, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from .config import TOKEN, DB_URI
 from .commands import HANDLERS
@@ -40,14 +40,20 @@ def save_message(message, db):
 
 
 def save_user(user, db):
-    row = {
+    table = db['users']
+
+    new_row = {
         'user_id': user.id,
         'first_name': user.first_name,
         'last_name': user.last_name,
         'username': user.username,
     }
 
-    db['users'].upsert(row, keys=['user_id'])
+    if table.find_one(user_id=user.id) is None:
+        new_row['tracked'] = True
+        table.insert(new_row)
+    else:
+        table.update(new_row, keys=['user_id'])
 
 
 def save(bot, update):
@@ -56,10 +62,32 @@ def save(bot, update):
     save_user(update.message.from_user, db)
 
 
+def track(user_id, value):
+    db = dataset.connect(DB_URI)
+    table = db['users']
+
+    new_row = {
+        'user_id': user_id,
+        'tracked': value,
+    }
+
+    table.upsert(new_row, keys=['user_id'])
+
+
+def opt_in(bot, update):
+    track(update.message.from_user.id, True)
+
+
+def opt_out(bot, update):
+    track(update.message.from_user.id, False)
+
+
 def run():
     updater = Updater(TOKEN)
 
     handlers = HANDLERS + [
+        CommandHandler('opt_in', opt_in),
+        CommandHandler('opt_out', opt_out),
         MessageHandler(Filters.all, save),  # must be last
     ]
 
