@@ -8,4 +8,7 @@ def average_message_length(user_id, chat_id):
     messages = db['messages'].find(user_id=user_id, chat_id=chat_id)
     messages = [m for m in messages if m['length'] is not None]
 
+    if not messages:
+        return 0
+
     return sum(m['length'] for m in messages) / len(messages)
