@@ -9,14 +9,14 @@ from .commands import HANDLERS
 logging.basicConfig()
 
 
-def is_tracked(user_id, db):
-    table = db['users']
-    row = table.find_one(user_id=user_id)
-    return row is None or row['tracked']
+def is_tracked(chat_id, user_id, db):
+    table = db['tracked']
+    row = table.find_one(chat_id=chat_id, user_id=user_id)
+    return row is not None
 
 
 def save_message(message, db):
-    if not is_tracked(message.from_user.id, db):
+    if not is_tracked(message.chat_id, message.from_user.id, db):
         return
 
     replied = None
@@ -58,11 +58,7 @@ def save_user(user, db):
         'username': user.username,
     }
 
-    if table.find_one(user_id=user.id) is None:
-        new_row['tracked'] = True
-        table.insert(new_row)
-    else:
-        table.update(new_row, keys=['user_id'])
+    table.upsert(new_row, keys=['user_id'])
 
 
 def save(bot, update):
@@ -71,24 +67,41 @@ def save(bot, update):
     save_user(update.message.from_user, db)
 
 
-def track(user_id, value):
-    db = dataset.connect(DB_URI)
-    table = db['users']
+def track(chat_id, user_id, value, db):
+    table = db['tracked']
 
-    new_row = {
-        'user_id': user_id,
-        'tracked': value,
-    }
-
-    table.upsert(new_row, keys=['user_id'])
+    if value:
+        table.insert(dict(chat_id=chat_id, user_id=user_id))
+    else:
+        table.delete(chat_id=chat_id, user_id=user_id)
 
 
 def opt_in(bot, update):
-    track(update.message.from_user.id, True)
+    message = update.message
+    chat_id = message.chat_id
+    user_id = message.from_user.id
+
+    db = dataset.connect(DB_URI)
+
+    track(chat_id, user_id, True, db)
+
+    message.reply_text(
+        'You are now being tracked in this chat. '
+        'Worry not, the contents of your messages are not saved, '
+        'only their length ;)'
+    )
 
 
 def opt_out(bot, update):
-    track(update.message.from_user.id, False)
+    message = update.message
+    chat_id = message.chat_id
+    user_id = message.from_user.id
+
+    db = dataset.connect(DB_URI)
+
+    track(chat_id, user_id, False, db)
+
+    message.reply_text('You are no longer being tracked in this chat ;)')
 
 
 def run():
