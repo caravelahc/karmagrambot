@@ -9,7 +9,16 @@ from .commands import HANDLERS
 logging.basicConfig()
 
 
+def is_tracked(user_id, db):
+    table = db['users']
+    row = table.find_one(user_id=user_id)
+    return row is None or row['tracked']
+
+
 def save_message(message, db):
+    if not is_tracked(message.from_user.id, db):
+        return
+
     replied = None
     if message.reply_to_message is not None:
         replied = message.reply_to_message.message_id
