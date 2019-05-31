@@ -38,7 +38,7 @@ def save_message(message, db):
     elif message.text == '-':
         vote = '-'
 
-    if vote is not None and already_vote(replied, message.from_user.id):
+    if vote is not None and already_voted(replied, message.from_user.id):
         return
 
     new_row = {
