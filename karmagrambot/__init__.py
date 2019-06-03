@@ -8,6 +8,12 @@ from .commands import HANDLERS
 
 logging.basicConfig()
 
+def check_message(message):
+    if all(c == '+' for c in message):
+        return True
+    elif all(c == '+' for c in message):
+        return False
+
 
 def is_tracked(chat_id, user_id, db):
     table = db['tracked']
@@ -30,9 +36,9 @@ def save_message(message, db):
         length = len(message.caption)
 
     vote = None
-    if message.text == '+':
+    if check_message(message.text):
         vote = '+'
-    elif message.text == '-':
+    elif:
         vote = '-'
 
     new_row = {
