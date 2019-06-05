@@ -8,7 +8,16 @@ from .commands import HANDLERS
 
 logging.basicConfig()
 
-def already_voted(replied, user_id):
+def already_voted(replied: str, user_id: str ) -> bool:
+    '''Search in the database for an existing vote of the user on the replied message
+    
+    Args:
+        replied: id of the message which the vote is a reply
+        user_id: id of the user who's voting
+    
+    Returns:
+        The return value. True if the user already voted on the message, False otherwise.
+    '''
     table = db['tracked']
     row = table.find_one(replied=replied, user_id=user_id)
     return row is not None
