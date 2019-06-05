@@ -8,12 +8,24 @@ from .commands import HANDLERS
 
 logging.basicConfig()
 
+def already_voted(replied: str, user_id: str ) -> bool:
+    '''Search in the database for an existing vote of the user on the replied message
+    
+    Args:
+        replied: id of the message which the vote is a reply
+        user_id: id of the user who's voting
+    
+    Returns:
+        The return value. True if the user already voted on the message, False otherwise.
+    '''
+    table = db['tracked']
+    row = table.find_one(replied=replied, user_id=user_id)
+    return row is not None
 
 def is_tracked(chat_id, user_id, db):
     table = db['tracked']
     row = table.find_one(chat_id=chat_id, user_id=user_id)
     return row is not None
-
 
 def save_message(message, db):
     if not is_tracked(message.chat_id, message.from_user.id, db):
@@ -34,6 +46,9 @@ def save_message(message, db):
         vote = '+'
     elif message.text == '-':
         vote = '-'
+
+    if vote is not None and already_voted(replied, message.from_user.id):
+        return
 
     new_row = {
         'timestamp': message.date,
