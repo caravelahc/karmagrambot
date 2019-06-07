@@ -1,6 +1,6 @@
 from telegram.ext import CommandHandler
 
-import analytics
+from . import analytics
 
 
 def average_length(bot: telegram.Bot, update: telegram.Update):
@@ -27,7 +27,7 @@ def karma(bot: telegram.Bot, update: telegram.Update):
 		update: the object that represents an incoming update for the bot to handle.
 
 	Returns:
-		Actually doesn't return anything, but answer the user with hers/his respective karma.
+		Doesn't actually return anything, but answer the user with hers/his respective karma.
 	"""
 
 	karma = analytics.get_karma(update.message.from_user.id, update.message.chat.id)
