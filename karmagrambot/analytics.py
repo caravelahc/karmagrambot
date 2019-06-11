@@ -38,3 +38,39 @@ def get_karma(user_id: int, chat_id: int) -> int:
                 bad_karma += 1
 
     return good_karma - bad_karma
+
+def get_top_10_karmas(chat_id: int) -> list:
+    """Get the top 10 karmas in a given group, if the doesn't have enough users, return the total amount.
+
+    Args:
+        chat_id: The id of the chat that we're interested in.
+
+    Returns:
+        A list with top 10 users with better karma.
+    """
+
+    db = dataset.connect(DB_URI)
+    users = db['tracked'].find(chat_id=chat_id)
+    users_id = [u['user_id'] for u in users]
+
+    user_karma = {user_id: get_karma(user_id, chat_id) for user_id in users_id}
+
+    sorted_users_id = sorted(user_karma, key=user_karma.get, reverse=True)
+
+    sorted_users = []
+    for i in range(len(sorted_users_id)):
+        user_id = sorted_users_id[i]
+        user = db['users'].find(user_id=user_id)
+
+        for u in user:
+            name = u['first_name']
+
+            if u['last_name'] is not None:
+                name += f" {u['last_name']}"
+
+        sorted_users.append({'name': name, 'karma': user_karma[user_id]})
+
+
+    top_10 = sorted_users[:10]
+
+    return top_10
