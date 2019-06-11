@@ -1,9 +1,11 @@
+from telegram import Bot, Update
+
 from telegram.ext import CommandHandler
 
 from . import analytics
 
 
-def average_length(bot: telegram.Bot, update: telegram.Update):
+def average_length(bot: Bot, update: Update):
     """Reply the user who invoked the command with hers/his average message length.
 
     Args:
@@ -19,7 +21,7 @@ def average_length(bot: telegram.Bot, update: telegram.Update):
 
     update.message.reply_text(response)
 
-def karma(bot: telegram.Bot, update: telegram.Update):
+def karma(bot: Bot, update: Update):
     """Reply the user who invoked the command with hers/his respective karma.
 
     Args:
