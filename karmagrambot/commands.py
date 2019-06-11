@@ -4,7 +4,7 @@ from telegram.ext import CommandHandler
 from . import analytics
 
 
-def average_length(bot: Bot, update: Update):
+def average_length(_: Bot, update: Update):
     """Reply the user who invoked the command with hers/his average message length.
 
     Args:
@@ -20,7 +20,8 @@ def average_length(bot: Bot, update: Update):
 
     update.message.reply_text(response)
 
-def karma(bot: Bot, update: Update):
+
+def karma(_: Bot, update: Update):
     """Reply the user who invoked the command with hers/his respective karma.
 
     Args:
@@ -31,11 +32,15 @@ def karma(bot: Bot, update: Update):
         Doesn't actually return anything, but answer the user with hers/his respective karma.
     """
 
-    karma = analytics.get_karma(update.message.from_user.id, update.message.chat.id)
+    user_karma = analytics.get_karma(
+        update.message.from_user.id,
+        update.message.chat.id,
+    )
 
-    update.message.reply_text(karma)
+    update.message.reply_text(user_karma)
 
-def karmas(bot: Bot, update: Update):
+
+def karmas(_: Bot, update: Update):
     """Shows the top 10 karmas in a given group, if the group doesn't have at least 10 users, show the maximum amount
 
     Args:

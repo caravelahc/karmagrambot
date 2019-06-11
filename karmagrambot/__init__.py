@@ -27,7 +27,7 @@ def check_message(message: str) -> bool:
 
 
 def already_voted(replied: str, user_id: str, db: dataset.Database) -> bool:
-    '''Search in the database for an existing vote of the user on the replied message
+    """Search in the database for an existing vote of the user on the replied message
 
     Args:
         replied: id of the message which the vote is a reply
@@ -35,7 +35,7 @@ def already_voted(replied: str, user_id: str, db: dataset.Database) -> bool:
 
     Returns:
         The return value. True if the user already voted on the message, False otherwise.
-    '''
+    """
     table = db['tracked']
     row = table.find_one(replied=replied, user_id=user_id)
     return row is not None
@@ -91,7 +91,7 @@ def save_user(user, db):
     table.upsert(new_row, keys=['user_id'])
 
 
-def save(bot, update):
+def save(_, update):
     db = dataset.connect(DB_URI)
     save_message(update.message, db)
     save_user(update.message.from_user, db)
@@ -106,7 +106,7 @@ def track(chat_id, user_id, value, db):
         table.delete(chat_id=chat_id, user_id=user_id)
 
 
-def opt_in(bot, update):
+def opt_in(_, update):
     message = update.message
     chat_id = message.chat_id
     user_id = message.from_user.id
@@ -122,7 +122,7 @@ def opt_in(bot, update):
     )
 
 
-def opt_out(bot, update):
+def opt_out(_, update):
     message = update.message
     chat_id = message.chat_id
     user_id = message.from_user.id
