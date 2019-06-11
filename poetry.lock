@@ -250,6 +250,17 @@ isort = ">=4.2.5,<5"
 mccabe = ">=0.6,<0.7"
 
 [[package]]
+category = "dev"
+description = "Quote consistency checker for PyLint.."
+name = "pylint-quotes"
+optional = false
+python-versions = ">=3.4"
+version = "0.2.1"
+
+[package.dependencies]
+pylint = ">=1.7.6"
+
+[[package]]
 category = "main"
 description = "Extensions to the standard Python datetime module"
 name = "python-dateutil"
@@ -314,7 +325,7 @@ python-versions = "*"
 version = "1.11.1"
 
 [metadata]
-content-hash = "86e3a3979723c589c190118d9b3d7ef0a62581808ffcadbe4c8d950fe24df90b"
+content-hash = "4a608a9e1d6d766ed878e9bf8dd8e411667eebcf624d649707e3f1baceb25593"
 python-versions = "^3.7"
 
 [metadata.hashes]
@@ -343,6 +354,7 @@ pycodestyle = ["95a2219d12372f05704562a14ec30bc76b05a5b297b21a5dfe3f6fac3491ae56
 pycparser = ["a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3"]
 pyflakes = ["5e8c00e30c464c99e0b501dc160b13a14af7f27d4dffb529c556e30a159e231d", "f277f9ca3e55de669fba45b7393a1449009cff5a37d1af10ebb76c52765269cd"]
 pylint = ["5d77031694a5fb97ea95e828c8d10fc770a1df6eb3906067aaed42201a8a6a09", "723e3db49555abaf9bf79dc474c6b9e2935ad82230b10c1138a71ea41ac0fff1"]
+pylint-quotes = ["5332fa8b48ce5d8780df196d684f38c00614f8233fdc4c67efbdc0bbe7dc51d7", "c53d2a63b4cd16c9fa426d243de6396910ff04c65001efdbea37427d401fce72"]
 python-dateutil = ["7e6584c74aeed623791615e26efd690f29817a27c73085b78e4bad02493df2fb", "c89805f6f4d64db21ed966fda138f8a5ed7a4fdbc1a8ee329ce1b74e3c74da9e"]
 python-editor = ["1bf6e860a8ad52a14c3ee1252d5dc25b2030618ed80c022598f00176adc8367d", "51fda6bcc5ddbbb7063b2af7509e43bd84bfc32a4ff71349ec7847713882327b", "5f98b069316ea1c2ed3f67e7f5df6c0d8f10b689964a4a811ff64f0106819ec8", "c3da2053dbab6b29c94e43c486ff67206eafbe7eb52dbec7390b5e2fb05aac77", "ea87e17f6ec459e780e4221f295411462e0d0810858e055fc514684350a2f522"]
 python-telegram-bot = ["78695b1f6e147e9b360ccfb1ac92b542cab27870ccaf04065a88ee601ffa58b6", "cca4e32ebb8da7fdf35ab2fa2b3edd441211364819c5592fc253acdb7561ea5b"]

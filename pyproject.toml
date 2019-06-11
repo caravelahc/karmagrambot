@@ -17,6 +17,7 @@ jedi = "^0.13.2"
 autopep8 = "^1.4"
 pylint = "^2.3"
 mypy = "^0.701.0"
+pylint_quotes = "^0.2.1"
 
 [tool.poetry.scripts]
 karmagrambot = "karmagrambot:run"
