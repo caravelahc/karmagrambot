@@ -19,8 +19,8 @@ persistent=yes
 load-plugins=pylint_quotes
 
 string-quote=single
-triple-quote=single
-docstring-quote=single
+triple-quote=double
+docstring-quote=double
 
 # Use multiple processes to speed up Pylint.
 jobs=1
