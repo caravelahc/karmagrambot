@@ -38,3 +38,29 @@ def get_karma(user_id: int, chat_id: int) -> int:
                 bad_karma += 1
 
     return good_karma - bad_karma
+
+def get_devil_saint(chat_id: int) -> dict:
+    """Get the users with the lowest and the greatest karma in a given chat.
+
+    Args:
+        chat_id: The id of the chat that we'll be searching in.
+
+    Returns:
+        A dictionary with the informations of both devil and saint.
+    """
+
+    db = dataset.connect(DB_URI)
+    users = db['tracked'].find(chat_id=chat_id)
+    users_id = [u['user_id'] for u in users]
+
+    user_karma = {user_id: get_karma(user_id, chat_id) for user_id in users_id}
+
+    devil_id = min(user_karma, key=user_karma.get)
+    saint_id = max(user_karma, key=user_karma.get)
+
+    devil = db['users'].find_one(user_id=devil_id)
+    saint = db['users'].find_one(user_id=saint_id)
+
+    devil_saint = {'devil': devil, 'saint': saint}
+
+    return devil_saint
