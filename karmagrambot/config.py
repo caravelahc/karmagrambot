@@ -1,7 +1,6 @@
+import json
 from os import environ
 from pathlib import Path
-import json
-
 
 try:
     CONFIG_DIR = Path(environ['XDG_CONFIG_HOME'], __package__)

@@ -1,10 +1,10 @@
-import dataset
 import logging
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import dataset
+from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 
-from .config import TOKEN, DB_URI
 from .commands import HANDLERS
+from .config import DB_URI, TOKEN
 
 logging.basicConfig()
 

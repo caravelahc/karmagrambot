@@ -1,9 +1,10 @@
+from typing import Dict, List
+
 import dataset
 
-from typing import List, Dict
-
 from .config import DB_URI
-from .types import UserKarma, DevilSaint
+from .types import DevilSaint, UserKarma
+
 
 def average_message_length(user_id: int, chat_id: int) -> float:
     """Get the average message length of an given user in a given chat
