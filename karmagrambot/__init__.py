@@ -9,10 +9,24 @@ from .commands import HANDLERS
 logging.basicConfig()
 
 def check_message(message):
-    if all(c == '+' for c in message):
-        return True
+    ''' Check if the message is composed only by -'s or + 's.
+
+
+    Args:
+        message: message received from the user
+
+
+    Returns:
+        The return value + if the message is only +, - if the message is only -, and None otherwise
+    '''
+    vote = None
+    if all(x == '-' for x in message):
+        vote = '-'
+        print(vote)
     elif all(c == '+' for c in message):
-        return False
+        vote = '+'
+
+    return vote
 
 
 def is_tracked(chat_id, user_id, db):
@@ -35,11 +49,7 @@ def save_message(message, db):
     elif message.caption is not None:
         length = len(message.caption)
 
-    vote = None
-    if check_message(message.text):
-        vote = '+'
-    elif:
-        vote = '-'
+    vote = check_message(message.text)
 
     new_row = {
         'timestamp': message.date,
