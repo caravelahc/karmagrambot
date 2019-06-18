@@ -8,6 +8,24 @@ from .commands import HANDLERS
 
 logging.basicConfig()
 
+
+def check_message(message: str) -> bool:
+    ''' Check if the message is composed only by -'s or + 's.
+
+    Args:
+        message: message received from the user
+
+    Returns:
+        The return value + if the message is only +, - if the message is only -, and None otherwise
+    '''
+    if all(x == '-' for x in message):
+        return '-'
+    elif all(c == '+' for c in message):
+        return '+'
+
+    return None
+
+
 def already_voted(replied: str, user_id: str ) -> bool:
     '''Search in the database for an existing vote of the user on the replied message
     
@@ -21,6 +39,7 @@ def already_voted(replied: str, user_id: str ) -> bool:
     table = db['tracked']
     row = table.find_one(replied=replied, user_id=user_id)
     return row is not None
+
 
 def is_tracked(chat_id, user_id, db):
     table = db['tracked']
@@ -41,11 +60,7 @@ def save_message(message, db):
     elif message.caption is not None:
         length = len(message.caption)
 
-    vote = None
-    if message.text == '+':
-        vote = '+'
-    elif message.text == '-':
-        vote = '-'
+    vote = check_message(message.text)
 
     if vote is not None and already_voted(replied, message.from_user.id):
         return
