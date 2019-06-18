@@ -19,14 +19,12 @@ def check_message(message):
     Returns:
         The return value + if the message is only +, - if the message is only -, and None otherwise
     '''
-    vote = None
     if all(x == '-' for x in message):
-        vote = '-'
-        print(vote)
+        return '-'
     elif all(c == '+' for c in message):
-        vote = '+'
+        return '+'
 
-    return vote
+    return None
 
 
 def is_tracked(chat_id, user_id, db):
