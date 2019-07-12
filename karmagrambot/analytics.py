@@ -1,6 +1,6 @@
 import dataset
 
-from typing import Dict
+from typing import List, Dict
 
 from .config import DB_URI
 from .types import UserKarma
@@ -42,7 +42,7 @@ def get_karma(user_id: int, chat_id: int) -> int:
 
     return good_karma - bad_karma
 
-def get_top_10_karmas(chat_id: int) -> list:
+def get_top_10_karmas(chat_id: int) -> List[UserKarma]:
     """Get the top 10 karmas in a given group, if the doesn't have enough users, return the total amount.
 
     Args:
@@ -61,14 +61,14 @@ def get_top_10_karmas(chat_id: int) -> list:
     sorted_users_id = sorted(user_karma, key=user_karma.get, reverse=True)
 
     sorted_users = []
-    for i in range(len(sorted_users_id)):
-        user_id = sorted_users_id[i]
+    for user_id in sorted_users_id:
         user = db['users'].find(user_id=user_id)
 
         name = user_name(*user)
 
-        sorted_users.append({'name': name, 'karma': user_karma[user_id]})
+        user = UserKarma(name, user_karma[user_id])
 
+        sorted_users.append(user)
 
     top_10 = sorted_users[:10]
 
