@@ -1,6 +1,9 @@
 import dataset
 
+from typing import Dict
+
 from .config import DB_URI
+from .types import UserKarma
 
 
 def average_message_length(user_id, chat_id):
@@ -62,11 +65,7 @@ def get_top_10_karmas(chat_id: int) -> list:
         user_id = sorted_users_id[i]
         user = db['users'].find(user_id=user_id)
 
-        for u in user:
-            name = u['first_name']
-
-            if u['last_name'] is not None:
-                name += f" {u['last_name']}"
+        name = user_name(*user)
 
         sorted_users.append({'name': name, 'karma': user_karma[user_id]})
 
@@ -74,3 +73,11 @@ def get_top_10_karmas(chat_id: int) -> list:
     top_10 = sorted_users[:10]
 
     return top_10
+
+def user_name(user: Dict[str, str]) -> str:
+    name = user['first_name']
+
+    if user['last_name'] is not None:
+        name += f" {user['last_name']}"
+
+    return name
