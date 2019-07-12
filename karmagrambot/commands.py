@@ -37,7 +37,7 @@ def karma(bot: Bot, update: Update):
     update.message.reply_text(karma)
 
 def karmas(bot: Bot, update: Update):
-    """Shows the top 10 karmas in a given group, if the groups doesn't have at least 10 users, show the maximum amount
+    """Shows the top 10 karmas in a given group, if the group doesn't have at least 10 users, show the maximum amount
 
     Args:
         bot: The object that represents the Telegram Bot.
@@ -47,11 +47,9 @@ def karmas(bot: Bot, update: Update):
         Doesn't return anything, but answer the user with the top 10 karmas in the group.
     """
 
-    top_users = analytics.get_top_10_karmas(update.message.chat.id)
+    top_users = analytics.get_top_n_karmas(update.message.chat.id, 10)
 
-    response = ''
-    for i in range(len(top_users)):
-        response += '{} - {} ({})\n'.format(i + 1, top_users[i]['name'], top_users[i]['karma'])
+    response = ''.join(f'{i} - {user.name} ({user.karma})' for i, user in enumerate(top_users, 1))
 
     update.message.reply_text(response)
 
