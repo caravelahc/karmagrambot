@@ -47,6 +47,7 @@ def get_top_n_karmas(chat_id: int, n: int) -> List[UserKarma]:
 
     Args:
         chat_id: The id of the chat that we're interested in.
+        n: The number of desired karmas
 
     Returns:
         A list with top n users with better karma.
