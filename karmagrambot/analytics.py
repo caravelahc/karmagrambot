@@ -6,15 +6,16 @@ from .config import DB_URI
 from .types import UserKarma
 
 
-def average_message_length(user_id, chat_id):
+def average_message_length(user_id: int, chat_id: int) -> float:
     db = dataset.connect(DB_URI)
-    messages = db['messages'].find(user_id=user_id, chat_id=chat_id)
-    messages = [m for m in messages if m['length'] is not None]
+    user_messages = db['messages'].find(user_id=user_id, chat_id=chat_id)
+    text_messages = [m for m in user_messages if m['length'] is not None]
 
-    if not messages:
-        return 0
+    if not text_messages:
+        return 0.
 
-    return sum(m['length'] for m in messages) / len(messages)
+    return sum(m['length'] for m in text_messages) / len(text_messages)
+
 
 def get_karma(user_id: int, chat_id: int) -> int:
     """Get the karma of an given user in a given chat.
