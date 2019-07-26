@@ -14,13 +14,13 @@ def check_all(results: List[Result]):
 
 @task
 def format(c):
-    c.run('yapf -ri karmagrambot')
+    c.run('black -q karmagrambot')
     c.run('isort -rc -y -q karmagrambot')
 
 
 @task
 def format_check(c):
     check_all([
-        c.run('yapf -rd karmagrambot', warn=True),
+        c.run('black --check -q karmagrambot', warn=True),
         c.run('isort -rc -c -q karmagrambot', warn=True),
     ])
