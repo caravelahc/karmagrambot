@@ -28,11 +28,11 @@ def check_message(message: str) -> bool:
 
 def already_voted(replied: str, user_id: str ) -> bool:
     '''Search in the database for an existing vote of the user on the replied message
-    
+
     Args:
         replied: id of the message which the vote is a reply
         user_id: id of the user who's voting
-    
+
     Returns:
         The return value. True if the user already voted on the message, False otherwise.
     '''
@@ -93,8 +93,27 @@ def save_user(user, db):
 
 def save(bot, update):
     db = dataset.connect(DB_URI)
-    save_message(update.message, db)
-    save_user(update.message.from_user, db)
+    message = update.message
+
+    save_message(message, db)
+    save_user(message.from_user, db)
+
+    if '@all' in message.text:
+        mention_all(message, db)
+
+
+def mention_all(message, db):
+    members = db.query(
+        'SELECT DISTINCT username '
+        'FROM users JOIN tracked '
+        'ON users.user_id = tracked.user_id '
+        'WHERE chat_id = :id',
+        id=message.chat_id,
+    )
+    usernames = (u['username'] for u in members)
+
+    sent = message.reply_text(' '.join(u for u in usernames if u is not None))
+    sent.edit_text('^')
 
 
 def track(chat_id, user_id, value, db):
