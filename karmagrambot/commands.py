@@ -36,6 +36,20 @@ def karma(bot: Bot, update: Update):
 
     update.message.reply_text(karma)
 
+def karmas(bot: Bot, update: Update):
+    """Shows the top 10 karmas in a given group, if the group doesn't have at least 10 users, show the maximum amount
+
+    Args:
+        bot: The object that represents the Telegram Bot.
+        update: The object that represents an incoming update for the bot to handle.
+    """
+
+    top_users = analytics.get_top_n_karmas(update.message.chat.id, 10)
+
+    response = ''.join(f'{i} - {user.name} ({user.karma})' for i, user in enumerate(top_users, 1))
+
+    update.message.reply_text(response)
+
 def devil(bot: Bot, update: Update):
     """Reply the user with some dumb text and the person with the lowest karma, the "devil".
 
@@ -47,10 +61,11 @@ def devil(bot: Bot, update: Update):
     devil = analytics.get_devil_saint(update.message.chat.id).devil
     response = f"{devil.name}, there's a special place in hell for you, see you there."
 
-    update.message.reply_text(response)
+    update.message.reply_text(response)   
 
 HANDLERS = [
     CommandHandler('average_length', average_length),
     CommandHandler('karma', karma),
+    CommandHandler('karmas', karmas),
     CommandHandler('devil', devil),
 ]
