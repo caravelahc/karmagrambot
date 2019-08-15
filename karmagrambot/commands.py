@@ -42,13 +42,10 @@ def devil(bot: Bot, update: Update):
     Args:
         bot: The object that represents the Telegram Bot.
         update: The object that represents an incoming update for the bot to handle.
-
-    Returns:
-        Doesn't return, but answer the user with the one with the lowest karma.
     """
 
-    devil = analytics.get_devil_saint(update.message.chat.id)['devil']
-    response = f"{devil['first_name']}, there's a special place in hell for you, see you there."
+    devil = analytics.get_devil_saint(update.message.chat.id).devil
+    response = f"{devil.name}, there's a special place in hell for you, see you there."
 
     update.message.reply_text(response)
 

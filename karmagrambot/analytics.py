@@ -2,6 +2,7 @@ import dataset
 
 from .config import DB_URI
 
+from .types import UserKarma, DevilSaint
 
 def average_message_length(user_id, chat_id):
     db = dataset.connect(DB_URI)
@@ -51,16 +52,14 @@ def get_devil_saint(chat_id: int) -> dict:
 
     db = dataset.connect(DB_URI)
     users = db['tracked'].find(chat_id=chat_id)
-    users_id = [u['user_id'] for u in users]
+    user_ids = [u['user_id'] for u in users]
 
-    user_karma = {user_id: get_karma(user_id, chat_id) for user_id in users_id}
-
-    devil_id = min(user_karma, key=user_karma.get)
-    saint_id = max(user_karma, key=user_karma.get)
+    devil_id = sorted(user_ids, key=lambda u: get_karma(u, chat_id))[0]
+    saint_id = sorted(user_ids, key=lambda u: get_karma(u, chat_id), reverse=True)[0]
 
     devil = db['users'].find_one(user_id=devil_id)
     saint = db['users'].find_one(user_id=saint_id)
 
-    devil_saint = {'devil': devil, 'saint': saint}
+    devil_saint = DevilSaint(UserKarma(user_name(*devil), get_karma(devil_id, chat_id)), UserKarma(user_name(*saint), get_karma(saint_id, chat_id)))
 
     return devil_saint
