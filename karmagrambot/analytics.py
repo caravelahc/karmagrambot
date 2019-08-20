@@ -93,8 +93,9 @@ def get_devil_saint(chat_id: int) -> DevilSaint:
     users = db['tracked'].find(chat_id=chat_id)
     user_ids = [u['user_id'] for u in users]
 
-    devil_id = sorted(user_ids, key=lambda u: get_karma(u, chat_id))[0]
-    saint_id = user_ids[-1]
+    sorted_ids = sorted(user_ids, key=lambda u: get_karma(u, chat_id))
+    devil_id = sorted_ids[0]
+    saint_id = sorted_ids[-1]
 
     devil = db['users'].find(user_id=devil_id)
     saint = db['users'].find(user_id=saint_id)
