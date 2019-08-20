@@ -55,7 +55,7 @@ def get_devil_saint(chat_id: int) -> dict:
     user_ids = [u['user_id'] for u in users]
 
     devil_id = sorted(user_ids, key=lambda u: get_karma(u, chat_id))[0]
-    saint_id = sorted(user_ids, key=lambda u: get_karma(u, chat_id), reverse=True)[0]
+    saint_id = user_ids[-1]
 
     devil = db['users'].find_one(user_id=devil_id)
     saint = db['users'].find_one(user_id=saint_id)
