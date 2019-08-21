@@ -9,8 +9,8 @@ def average_length(bot: Bot, update: Update):
     """Reply the user who invoked the command with hers/his average message length.
 
     Args:
-        bot: the object that represents the Telegram Bot.
-        update: the object that represents an incoming update for the bot to handle.
+        bot: The object that represents the Telegram Bot.
+        update: The object that represents an incoming update for the bot to handle.
 
     Returns:
         Doesn't return anything, but reply the user with hers/his respective average length.
@@ -25,8 +25,8 @@ def karma(bot: Bot, update: Update):
     """Reply the user who invoked the command with hers/his respective karma.
 
     Args:
-        bot: the object that represents the Telegram Bot.
-        update: the object that represents an incoming update for the bot to handle.
+        bot: The object that represents the Telegram Bot.
+        update: The object that represents an incoming update for the bot to handle.
 
     Returns:
         Doesn't actually return anything, but answer the user with hers/his respective karma.
@@ -42,9 +42,6 @@ def karmas(bot: Bot, update: Update):
     Args:
         bot: The object that represents the Telegram Bot.
         update: The object that represents an incoming update for the bot to handle.
-
-    Returns:
-        Doesn't return anything, but answer the user with the top 10 karmas in the group.
     """
 
     top_users = analytics.get_top_n_karmas(update.message.chat.id, 10)
@@ -53,8 +50,22 @@ def karmas(bot: Bot, update: Update):
 
     update.message.reply_text(response)
 
+def devil(bot: Bot, update: Update):
+    """Reply the user with some dumb text and the person with the lowest karma, the "devil".
+
+    Args:
+        bot: The object that represents the Telegram Bot.
+        update: The object that represents an incoming update for the bot to handle.
+    """
+
+    devil = analytics.get_devil_saint(update.message.chat.id).devil
+    response = f"{devil.name}, there's a special place in hell for you, see you there."
+
+    update.message.reply_text(response)   
+
 HANDLERS = [
     CommandHandler('average_length', average_length),
     CommandHandler('karma', karma),
     CommandHandler('karmas', karmas),
+    CommandHandler('devil', devil),
 ]
