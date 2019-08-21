@@ -63,9 +63,23 @@ def devil(bot: Bot, update: Update):
 
     update.message.reply_text(response)   
 
+def saint(bot: Bot, update: Update):
+    """Reply the user with a message and the person with the highest karma, the "saint".
+
+    Args:
+        bot: The object that represents the Telegram Bot.
+        update: The object that represents an incoming update for the bot to handle.
+    """
+
+    saint = analytics.get_devil_saint(update.message.chat.id).saint
+    response = f"{saint.name}, apparently you're the nicest person here. I don't like you."
+
+    bot.send_message(update.message.chat_id, response)
+
 HANDLERS = [
     CommandHandler('average_length', average_length),
     CommandHandler('karma', karma),
     CommandHandler('karmas', karmas),
     CommandHandler('devil', devil),
+    CommandHandler('saint', saint),
 ]
