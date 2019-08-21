@@ -26,13 +26,13 @@ def check_message(message: str) -> bool:
     return None
 
 
-def already_voted(replied: str, user_id: str ) -> bool:
+def already_voted(replied: str, user_id: str, db: dataset.Database) -> bool:
     '''Search in the database for an existing vote of the user on the replied message
-    
+
     Args:
         replied: id of the message which the vote is a reply
         user_id: id of the user who's voting
-    
+
     Returns:
         The return value. True if the user already voted on the message, False otherwise.
     '''
@@ -62,7 +62,7 @@ def save_message(message, db):
 
     vote = check_message(message.text)
 
-    if vote is not None and already_voted(replied, message.from_user.id):
+    if vote is not None and already_voted(replied, message.from_user.id, db):
         return
 
     new_row = {
