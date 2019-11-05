@@ -133,6 +133,29 @@ def opt_out(bot, update):
 
     message.reply_text('You are no longer being tracked in this chat ;)')
 
+def get_karma(bot, update):
+    message = update.message
+    chat_id = message.chat_id
+    user_id = message.from_user.id
+    text = message.text
+    username = message.from_user.username
+
+    if message.reply_to_message is not None:
+        user_id = message.reply_to_message.from_user.id
+        username = message.reply_to_message.from_user.username
+    
+    if len(text.split()) > 1:
+        username = text.split()[1]
+        db = dataset.connect(DB_URI)
+        users = db['users'].find(username=username)
+        for user in users:
+            user_id = user['user_id']
+        username = 'This user'
+
+    karma = analytics.get_karma(user_id, chat_id)
+
+    message.reply_text(f'@{username} has {karma} karma')
+
 
 def run():
     updater = Updater(TOKEN)
@@ -140,6 +163,7 @@ def run():
     handlers = HANDLERS + [
         CommandHandler('opt_in', opt_in),
         CommandHandler('opt_out', opt_out),
+        CommandHandler('get_karma', get_karma),
         MessageHandler(Filters.all, save),  # must be last
     ]
 
