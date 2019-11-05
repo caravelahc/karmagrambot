@@ -133,27 +133,43 @@ def opt_out(bot, update):
 
     message.reply_text('You are no longer being tracked in this chat ;)')
 
+
+def karma_id_with_message(message):
+    target_message = message.reply_to_message if message.reply_to_message is not None else message
+
+    user_id = target_message.from_user.id
+    username = target_message.from_user.username
+
+    return user_id, username
+
+
+def karma_id_with_username(message, username):
+    db = dataset.connect(DB_URI)
+    try:
+        [user,] = db['users'].find(username=username)
+    except ValueError:
+        return None
+
+    user_id = user['user_id']
+
+    return user_id, username
+
+
 def get_karma(bot, update):
     message = update.message
-    chat_id = message.chat_id
     text = message.text
+    message.from_user.username
 
-    target_message = message.reply_to_message if message.reply_to_message is not None else message
-    user_id = target_message.from_user.id
-    username = f'@{target_message.from_user.username}'
+    _, *args = text.split()
 
-    if len(text.split()) > 1:
-        username_from_msg = text.split()[1]
-        db = dataset.connect(DB_URI)
-        users = db['users'].find(username=username_from_msg[1:]) #[1:] to remove the preceding @ from username
-        for user in users:
-            user_id = user['user_id']
-            username=username_from_msg
-        if username != username_from_msg:
-            message.reply_text(f'{username_from_msg} is not in the database for this chat')
-            return
+    user_id, username = karma_id_with_message(message) if not args else karma_id_with_username(args[1])
 
-    karma = analytics.get_karma(user_id, chat_id)
+    if user_id is None:
+        message.reply_text(f'Could not find user named {username}')
+        return
+
+    karma = analytics.get_karma(user_id, message.chat_id)
+
     message.reply_text(f'{username} has {karma} karma in this chat')
 
 
