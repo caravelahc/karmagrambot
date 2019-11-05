@@ -136,22 +136,19 @@ def opt_out(bot, update):
 def get_karma(bot, update):
     message = update.message
     chat_id = message.chat_id
-    user_id = message.from_user.id
     text = message.text
-    username = f'@{message.from_user.username}'
 
-    if message.reply_to_message is not None:
-        user_id = message.reply_to_message.from_user.id
-        username = f'@{message.reply_to_message.from_user.username}'
-    
+    target_message = message.reply_to_message if message.reply_to_message is not None else message
+    user_id = target_message.from_user.id
+    username = f'@{target_message.from_user.username}'
+
     if len(text.split()) > 1:
         username_from_msg = text.split()[1]
         db = dataset.connect(DB_URI)
         users = db['users'].find(username=username_from_msg[1:]) #[1:] to remove the preceding @ from username
         for user in users:
             user_id = user['user_id']
-            username=f'{username_from_msg}'
-            print(user_id)
+            username=username_from_msg
         if username != username_from_msg:
             message.reply_text(f'{username_from_msg} is not in the database for this chat')
             return
