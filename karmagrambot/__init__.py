@@ -146,7 +146,7 @@ def karma_id_with_message(message):
 def karma_id_with_username(username):
     db = dataset.connect(DB_URI)
     try:
-        [user,] = db['users'].find(username=username)
+        [user,] = db['users'].find(username=username.lstrip('@'))
     except ValueError:
         return None, username
 
