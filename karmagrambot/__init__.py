@@ -143,12 +143,12 @@ def karma_id_with_message(message):
     return user_id, username
 
 
-def karma_id_with_username(message, username):
+def karma_id_with_username(username):
     db = dataset.connect(DB_URI)
     try:
         [user,] = db['users'].find(username=username)
     except ValueError:
-        return None
+        return None, username
 
     user_id = user['user_id']
 
@@ -162,7 +162,7 @@ def get_karma(bot, update):
 
     _, *args = text.split()
 
-    user_id, username = karma_id_with_message(message) if not args else karma_id_with_username(args[1])
+    user_id, username = karma_id_with_message(message) if not args else karma_id_with_username(args[0])
 
     if user_id is None:
         message.reply_text(f'Could not find user named {username}')
