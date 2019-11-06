@@ -46,7 +46,7 @@ def karmas(bot: Bot, update: Update):
 
     top_users = analytics.get_top_n_karmas(update.message.chat.id, 10)
 
-    response = ''.join(f'{i} - {user.name} ({user.karma})' for i, user in enumerate(top_users, 1))
+    response = ''.join(f'{i} - {user.name} ({user.karma})\n' for i, user in enumerate(top_users, 1))
 
     update.message.reply_text(response)
 
