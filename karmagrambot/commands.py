@@ -15,7 +15,9 @@ def average_length(_: Bot, update: Update):
         Doesn't return anything, but reply the user with hers/his respective average length.
     """
 
-    average = analytics.average_message_length(update.message.from_user.id, update.message.chat.id)
+    average = analytics.average_message_length(
+        update.message.from_user.id, update.message.chat.id
+    )
     response = f'{average:.3}'
 
     update.message.reply_text(response)
@@ -33,8 +35,7 @@ def karma(_: Bot, update: Update):
     """
 
     user_karma = analytics.get_karma(
-        update.message.from_user.id,
-        update.message.chat.id,
+        update.message.from_user.id, update.message.chat.id
     )
 
     update.message.reply_text(user_karma)
@@ -50,9 +51,12 @@ def karmas(_: Bot, update: Update):
 
     top_users = analytics.get_top_n_karmas(update.message.chat.id, 10)
 
-    response = ''.join(f'{i} - {user.name} ({user.karma})' for i, user in enumerate(top_users, 1))
+    response = ''.join(
+        f'{i} - {user.name} ({user.karma})' for i, user in enumerate(top_users, 1)
+    )
 
     update.message.reply_text(response)
+
 
 def devil(bot: Bot, update: Update):
     """Reply the user with some dumb text and the person with the lowest karma, the "devil".
@@ -65,7 +69,8 @@ def devil(bot: Bot, update: Update):
     devil = analytics.get_devil_saint(update.message.chat.id).devil
     response = f"{devil.name}, there's a special place in hell for you, see you there."
 
-    update.message.reply_text(response)   
+    update.message.reply_text(response)
+
 
 HANDLERS = [
     CommandHandler('average_length', average_length),

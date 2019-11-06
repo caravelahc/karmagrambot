@@ -46,6 +46,7 @@ def is_tracked(chat_id, user_id, db):
     row = table.find_one(chat_id=chat_id, user_id=user_id)
     return row is not None
 
+
 def save_message(message, db):
     if not is_tracked(message.chat_id, message.from_user.id, db):
         return
@@ -135,7 +136,9 @@ def opt_out(_, update):
 
 
 def karma_id_with_message(message):
-    target_message = message.reply_to_message if message.reply_to_message is not None else message
+    target_message = (
+        message.reply_to_message if message.reply_to_message is not None else message
+    )
 
     user_id = target_message.from_user.id
     username = target_message.from_user.username
@@ -146,7 +149,7 @@ def karma_id_with_message(message):
 def karma_id_with_username(username):
     db = dataset.connect(DB_URI)
     try:
-        [user,] = db['users'].find(username=username)
+        [user] = db['users'].find(username=username)
     except ValueError:
         return None, username
 
@@ -162,7 +165,9 @@ def get_karma(bot, update):
 
     _, *args = text.split()
 
-    user_id, username = karma_id_with_message(message) if not args else karma_id_with_username(args[0])
+    user_id, username = (
+        karma_id_with_message(message) if not args else karma_id_with_username(args[0])
+    )
 
     if user_id is None:
         message.reply_text(f'Could not find user named {username}')
