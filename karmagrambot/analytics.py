@@ -60,7 +60,7 @@ def get_top_n_karmas(chat_id: int, n: int) -> List[UserKarma]:
         A list with top n users with better karma.
     """
     db = dataset.connect(DB_URI)
-    users = db['tracked'].find(chat_id=chat_id)
+    users = db['tracked'].distinct('user_id', chat_id=chat_id)
     user_ids = [u['user_id'] for u in users]
     
     sorted_user_ids = sorted(user_ids, key=lambda u: get_karma(u, chat_id), reverse=True)
