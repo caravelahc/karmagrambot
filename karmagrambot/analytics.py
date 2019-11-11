@@ -1,5 +1,6 @@
 import dataset
 
+from collections import defaultdict
 from typing import List, Dict
 
 from .config import DB_URI
@@ -34,21 +35,13 @@ def get_karma(user_id: int, chat_id: int) -> int:
     Returns:
         The karma value.
     """
-
     db = dataset.connect(DB_URI)
-    user_messages = db['messages'].find(user_id=user_id, chat_id=chat_id)
 
-    good_karma = 0
-    bad_karma = 0
-    for message in user_messages:
-        replies_to_message = db['messages'].find(replied=message['message_id'])
-        for reply in replies_to_message:
-            if reply['vote'] == '+':
-                good_karma += 1
-            elif reply['vote'] == '-':
-                bad_karma += 1
+    result = db.query('select vote, count(1) as num from messages where vote is not null and chat_id = :chat_id and replied in (select message_id from messages where user_id = :user_id and chat_id = :chat_id) group by vote;', user_id=user_id, chat_id=chat_id)
 
-    return good_karma - bad_karma
+    votes = defaultdict(lambda: 0, (x.values() for x in result))
+
+    return votes['+'] - votes['-']
 
 
 def get_top_n_karmas(chat_id: int, n: int) -> List[UserKarma]:
@@ -62,7 +55,7 @@ def get_top_n_karmas(chat_id: int, n: int) -> List[UserKarma]:
     db = dataset.connect(DB_URI)
     users = db['tracked'].distinct('user_id', chat_id=chat_id)
     user_ids = [u['user_id'] for u in users]
-    
+
     sorted_user_ids = sorted(user_ids, key=lambda u: get_karma(u, chat_id), reverse=True)
 
     sorted_users = []
@@ -71,7 +64,7 @@ def get_top_n_karmas(chat_id: int, n: int) -> List[UserKarma]:
 
         name = user_name(*user)
 
-        user = UserKarma(name, get_karma(user_id, chat_id))
+       user = UserKarma(name, get_karma(user_id, chat_id))
 
         sorted_users.append(user)
 
@@ -109,5 +102,5 @@ def user_name(user: Dict[str, str]) -> str:
 
     if user['last_name'] is not None:
         name += f" {user['last_name']}"
-    
+
     return name
