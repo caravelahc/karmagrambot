@@ -68,7 +68,7 @@ def get_top_n_karmas(chat_id: int, n: int) -> List[UserKarma]:
 
         name = user_name(*user)
 
-       user = UserKarma(name, get_karma(user_id, chat_id))
+        user = UserKarma(name, get_karma(user_id, chat_id))
 
         sorted_users.append(user)
 
