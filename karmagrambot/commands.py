@@ -1,11 +1,10 @@
 from telegram import Bot, Update
-
 from telegram.ext import CommandHandler
 
 from . import analytics
 
 
-def average_length(bot: Bot, update: Update):
+def average_length(_: Bot, update: Update):
     """Reply the user who invoked the command with hers/his average message length.
 
     Args:
@@ -16,12 +15,15 @@ def average_length(bot: Bot, update: Update):
         Doesn't return anything, but reply the user with hers/his respective average length.
     """
 
-    average = analytics.average_message_length(update.message.from_user.id, update.message.chat.id)
+    average = analytics.average_message_length(
+        update.message.from_user.id, update.message.chat.id
+    )
     response = f'{average:.3}'
 
     update.message.reply_text(response)
 
-def karma(bot: Bot, update: Update):
+
+def karma(_: Bot, update: Update):
     """Reply the user who invoked the command with hers/his respective karma.
 
     Args:
@@ -32,11 +34,14 @@ def karma(bot: Bot, update: Update):
         Doesn't actually return anything, but answer the user with hers/his respective karma.
     """
 
-    karma = analytics.get_karma(update.message.from_user.id, update.message.chat.id)
+    user_karma = analytics.get_karma(
+        update.message.from_user.id, update.message.chat.id
+    )
 
-    update.message.reply_text(karma)
+    update.message.reply_text(user_karma)
 
-def karmas(bot: Bot, update: Update):
+
+def karmas(_: Bot, update: Update):
     """Shows the top 10 karmas in a given group, if the group doesn't have at least 10 users, show the maximum amount
 
     Args:
@@ -46,9 +51,12 @@ def karmas(bot: Bot, update: Update):
 
     top_users = analytics.get_top_n_karmas(update.message.chat.id, 10)
 
-    response = ''.join(f'{i} - {user.name} ({user.karma})\n' for i, user in enumerate(top_users, 1))
+    response = '\n'.join(
+        f'{i} - {user.name} ({user.karma})' for i, user in enumerate(top_users, 1)
+    )
 
     update.message.reply_text(response)
+
 
 def devil(bot: Bot, update: Update):
     """Reply the user with some dumb text and the person with the lowest karma, the "devil".
@@ -61,7 +69,8 @@ def devil(bot: Bot, update: Update):
     devil = analytics.get_devil_saint(update.message.chat.id).devil
     response = f"{devil.name}, there's a special place in hell for you, see you there."
 
-    update.message.reply_text(response)   
+    update.message.reply_text(response)
+
 
 def saint(bot: Bot, update: Update):
     """Reply the user with a message and the person with the highest karma, the "saint".

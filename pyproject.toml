@@ -14,10 +14,18 @@ dataset = "^1.1"
 [tool.poetry.dev-dependencies]
 flake8 = "^3.7"
 jedi = "^0.13.2"
-autopep8 = "^1.4"
+pylint = "^2.3"
+mypy = "^0.701.0"
+pylint_quotes = "^0.2.1"
+isort = "^4.3"
+invoke = "^1.2"
+black = "^19.3b0"
 
 [tool.poetry.scripts]
 karmagrambot = "karmagrambot:run"
+
+[tool.black]
+skip_string_normalization = true
 
 [build-system]
 requires = ["poetry>=0.12"]

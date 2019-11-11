@@ -1,10 +1,10 @@
-import dataset
 import logging
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import dataset
+from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 
-from .config import TOKEN, DB_URI
 from .commands import HANDLERS
+from .config import DB_URI, TOKEN
 
 logging.basicConfig()
 
@@ -27,7 +27,7 @@ def check_message(message: str) -> bool:
 
 
 def already_voted(replied: str, user_id: str, db: dataset.Database) -> bool:
-    '''Search in the database for an existing vote of the user on the replied message
+    """Search in the database for an existing vote of the user on the replied message
 
     Args:
         replied: id of the message which the vote is a reply
@@ -35,7 +35,7 @@ def already_voted(replied: str, user_id: str, db: dataset.Database) -> bool:
 
     Returns:
         The return value. True if the user already voted on the message, False otherwise.
-    '''
+    """
     table = db['tracked']
     row = table.find_one(replied=replied, user_id=user_id)
     return row is not None
@@ -45,6 +45,7 @@ def is_tracked(chat_id, user_id, db):
     table = db['tracked']
     row = table.find_one(chat_id=chat_id, user_id=user_id)
     return row is not None
+
 
 def save_message(message, db):
     if not is_tracked(message.chat_id, message.from_user.id, db):
@@ -91,7 +92,7 @@ def save_user(user, db):
     table.upsert(new_row, keys=['user_id'])
 
 
-def save(bot, update):
+def save(_, update):
     db = dataset.connect(DB_URI)
     save_message(update.message, db)
     save_user(update.message.from_user, db)
@@ -106,7 +107,7 @@ def track(chat_id, user_id, value, db):
         table.delete(chat_id=chat_id, user_id=user_id)
 
 
-def opt_in(bot, update):
+def opt_in(_, update):
     message = update.message
     chat_id = message.chat_id
     user_id = message.from_user.id
@@ -122,7 +123,7 @@ def opt_in(bot, update):
     )
 
 
-def opt_out(bot, update):
+def opt_out(_, update):
     message = update.message
     chat_id = message.chat_id
     user_id = message.from_user.id
@@ -135,7 +136,9 @@ def opt_out(bot, update):
 
 
 def karma_id_with_message(message):
-    target_message = message.reply_to_message if message.reply_to_message is not None else message
+    target_message = (
+        message.reply_to_message if message.reply_to_message is not None else message
+    )
 
     user_id = target_message.from_user.id
     username = target_message.from_user.username
@@ -146,7 +149,7 @@ def karma_id_with_message(message):
 def karma_id_with_username(username):
     db = dataset.connect(DB_URI)
     try:
-        [user,] = db['users'].find(username=username.lstrip('@'))
+        [user] = db['users'].find(username=username.lstrip('@'))
     except ValueError:
         return None, username
 
@@ -162,7 +165,9 @@ def get_karma(bot, update):
 
     _, *args = text.split()
 
-    user_id, username = karma_id_with_message(message) if not args else karma_id_with_username(args[0])
+    user_id, username = (
+        karma_id_with_message(message) if not args else karma_id_with_username(args[0])
+    )
 
     if user_id is None:
         message.reply_text(f'Could not find user named {username}')
