@@ -114,6 +114,10 @@ def opt_in(_, update):
 
     db = dataset.connect(DB_URI)
 
+    if is_tracked(chat_id, user_id, db):
+        message.reply_text('You are already being tracked in this chat.')
+        return
+
     track(chat_id, user_id, True, db)
 
     message.reply_text(
