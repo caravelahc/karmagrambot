@@ -18,8 +18,12 @@ def average_message_length(user_id: int, chat_id: int) -> float:
     """
 
     db = dataset.connect(DB_URI)
-    messages = db['messages'].find(user_id=user_id, chat_id=chat_id)
-    messages = [m for m in messages if m['length'] is not None]
+    messages = list(db['messages'].find(
+        user_id=user_id,
+        chat_id=chat_id,
+        vote=None,
+        length={'not': None}
+    ))
 
     if not messages:
         return 0
