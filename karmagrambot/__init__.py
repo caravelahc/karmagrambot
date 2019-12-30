@@ -47,7 +47,7 @@ def already_voted(replied: str, user_id: str, db: dataset.Database) -> bool:
     Returns:
         The return value. True if the user already voted on the message, False otherwise.
     """
-    table = db['tracked']
+    table = db['messages']
     row = table.find_one(replied=replied, user_id=user_id)
     return row is not None
 
@@ -95,6 +95,21 @@ def save_message(message, db):
 
     message_info = get_message_info(message)
 
+    def get_valid_vote() -> Optional[str]:
+        vote = message_info.vote
+
+        if vote is None:
+            return None
+
+        print(f'vote {vote} is not none, checking if already voted...')
+
+        if already_voted(message_info.replied, message.from_user.id, db):
+            return None
+
+        print(f'not already voted.')
+
+        return vote
+
     new_row = {
         'timestamp': message.date,
         'message_id': message.message_id,
@@ -102,7 +117,7 @@ def save_message(message, db):
         'user_id': message.from_user.id,
         'replied': message_info.replied,
         'length': message_info.length,
-        'vote': message_info.vote,
+        'vote': get_valid_vote(),
     }
 
     db['messages'].upsert(new_row, keys=['message_id', 'chat_id'])
