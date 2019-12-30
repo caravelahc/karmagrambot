@@ -1,6 +1,9 @@
 import logging
+from dataclasses import dataclass
+from typing import Optional, Tuple
 
 import dataset
+from telegram import Message
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 
 from .commands import HANDLERS
@@ -9,18 +12,26 @@ from .config import DB_URI, TOKEN
 logging.basicConfig()
 
 
-def check_message(message: str) -> bool:
-    ''' Check if the message is composed only by -'s or + 's.
+@dataclass(frozen=True)
+class MessageInfo:
+    replied: Optional[int] = None
+    length: Optional[int] = None
+    vote: Optional[str] = None
+
+
+def get_vote(message: str) -> Optional[str]:
+    """Check if the message is composed only by -'s or + 's.
 
     Args:
         message: message received from the user
 
     Returns:
         The return value + if the message is only +, - if the message is only -, and None otherwise
-    '''
+    """
     if all(x == '-' for x in message):
         return '-'
-    elif all(c == '+' for c in message):
+
+    if all(c == '+' for c in message):
         return '+'
 
     return None
@@ -47,33 +58,51 @@ def is_tracked(chat_id, user_id, db):
     return row is not None
 
 
+def get_message_text(message: Message) -> Optional[str]:
+    if message.text is not None:
+        return message.text
+
+    if message.caption is not None:
+        return message.caption
+
+    return None
+
+def get_message_info(message: Message) -> MessageInfo:
+    replied = (
+        message.reply_to_message.message_id
+        if message.reply_to_message is not None
+        else None
+    )
+
+    text = get_message_text(message)
+
+    if text is None:
+        return MessageInfo(replied=replied)
+
+    length = len(text)
+    vote = get_vote(text)
+
+    return MessageInfo(
+        replied=replied,
+        length=length,
+        vote=vote
+    )
+
+
 def save_message(message, db):
     if not is_tracked(message.chat_id, message.from_user.id, db):
         return
 
-    replied = None
-    if message.reply_to_message is not None:
-        replied = message.reply_to_message.message_id
-
-    length = None
-    if message.text is not None:
-        length = len(message.text)
-    elif message.caption is not None:
-        length = len(message.caption)
-
-    vote = check_message(message.text)
-
-    if vote is not None and already_voted(replied, message.from_user.id, db):
-        return
+    message_info = get_message_info(message)
 
     new_row = {
         'timestamp': message.date,
         'message_id': message.message_id,
         'chat_id': message.chat_id,
         'user_id': message.from_user.id,
-        'replied': replied,
-        'length': length,
-        'vote': vote,
+        'replied': message_info.replied,
+        'length': message_info.length,
+        'vote': message_info.vote,
     }
 
     db['messages'].upsert(new_row, keys=['message_id', 'chat_id'])
