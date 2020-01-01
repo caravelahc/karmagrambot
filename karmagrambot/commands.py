@@ -1,7 +1,12 @@
+"""Aggregate every user-available command."""
 from telegram import Bot, Update
 from telegram.ext import CommandHandler
 
+import dataset
+
 from . import analytics
+from .config import DB_URI
+from .util import user_info_from_message_or_reply, user_info_from_username
 
 
 def average_length(_: Bot, update: Update):
@@ -10,9 +15,6 @@ def average_length(_: Bot, update: Update):
     Args:
         bot: The object that represents the Telegram Bot.
         update: The object that represents an incoming update for the bot to handle.
-
-    Returns:
-        Doesn't return anything, but reply the user with hers/his respective average length.
     """
 
     average = analytics.average_message_length(
@@ -29,26 +31,41 @@ def karma(_: Bot, update: Update):
     Args:
         bot: The object that represents the Telegram Bot.
         update: The object that represents an incoming update for the bot to handle.
-
-    Returns:
-        Doesn't actually return anything, but answer the user with hers/his respective karma.
     """
+    db = dataset.connect(DB_URI)
 
-    user_karma = analytics.get_karma(
-        update.message.from_user.id, update.message.chat.id
+    message = update.message
+    text = message.text
+
+    _, *args = text.split()
+
+    username = args[0].lstrip('@') if args else None
+
+    user_info = (
+        user_info_from_message_or_reply(message)
+        if username is None
+        else user_info_from_username(db, username)
     )
 
-    update.message.reply_text(user_karma)
+    if user_info is None:
+        message.reply_text(f'Could not find user named {username}')
+        return
+
+    user_karma = analytics.get_karma(user_info.user_id, message.chat_id)
+
+    message.reply_text(f'{user_info.username} has {user_karma} karma in this chat')
 
 
 def karmas(_: Bot, update: Update):
-    """Shows the top 10 karmas in a given group, if the group doesn't have at least 10 users, show the maximum amount
+    """Shows the top 10 karmas in a given group.
+
+    If the group doesn't have at least 10 users, shows as many as there are in
+    the group.
 
     Args:
         bot: The object that represents the Telegram Bot.
         update: The object that represents an incoming update for the bot to handle.
     """
-
     top_users = analytics.get_top_n_karmas(update.message.chat.id, 10)
 
     response = '\n'.join(
@@ -58,32 +75,31 @@ def karmas(_: Bot, update: Update):
     update.message.reply_text(response)
 
 
-def devil(bot: Bot, update: Update):
+def devil(_: Bot, update: Update):
     """Reply the user with some dumb text and the person with the lowest karma, the "devil".
 
     Args:
         bot: The object that represents the Telegram Bot.
         update: The object that represents an incoming update for the bot to handle.
     """
-
-    devil = analytics.get_devil_saint(update.message.chat.id).devil
-    response = f"{devil.name}, there's a special place in hell for you, see you there."
+    group_devil = analytics.get_devil_saint(update.message.chat.id).devil
+    response = f"{group_devil.name}, there's a special place in hell for you, see you there."
 
     update.message.reply_text(response)
 
 
-def saint(bot: Bot, update: Update):
+def saint(_: Bot, update: Update):
     """Reply the user with a message and the person with the highest karma, the "saint".
 
     Args:
         bot: The object that represents the Telegram Bot.
         update: The object that represents an incoming update for the bot to handle.
     """
+    group_saint = analytics.get_devil_saint(update.message.chat.id).saint
+    response = f"{group_saint.name}, apparently you're the nicest person here. I don't like you."
 
-    saint = analytics.get_devil_saint(update.message.chat.id).saint
-    response = f"{saint.name}, apparently you're the nicest person here. I don't like you."
+    update.message.reply_text(response)
 
-    bot.send_message(update.message.chat_id, response)
 
 HANDLERS = [
     CommandHandler('average_length', average_length),
