@@ -101,12 +101,8 @@ def save_message(message, db):
         if vote is None:
             return None
 
-        print(f'vote {vote} is not none, checking if already voted...')
-
         if already_voted(message_info.replied, message.from_user.id, db):
             return None
-
-        print(f'not already voted.')
 
         return vote
 
