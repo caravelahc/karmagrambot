@@ -179,56 +179,12 @@ def opt_out(_, update):
     message.reply_text('You are no longer being tracked in this chat ;)')
 
 
-def karma_id_with_message(message):
-    target_message = (
-        message.reply_to_message if message.reply_to_message is not None else message
-    )
-
-    user_id = target_message.from_user.id
-    username = target_message.from_user.username
-
-    return user_id, username
-
-
-def karma_id_with_username(username):
-    db = dataset.connect(DB_URI)
-    try:
-        [user] = db['users'].find(username=username.lstrip('@'))
-    except ValueError:
-        return None, username
-
-    user_id = user['user_id']
-
-    return user_id, username
-
-
-def get_karma(bot, update):
-    message = update.message
-    text = message.text
-    message.from_user.username
-
-    _, *args = text.split()
-
-    user_id, username = (
-        karma_id_with_message(message) if not args else karma_id_with_username(args[0])
-    )
-
-    if user_id is None:
-        message.reply_text(f'Could not find user named {username}')
-        return
-
-    karma = analytics.get_karma(user_id, message.chat_id)
-
-    message.reply_text(f'{username} has {karma} karma in this chat')
-
-
 def run():
     updater = Updater(TOKEN)
 
     handlers = HANDLERS + [
         CommandHandler('opt_in', opt_in),
         CommandHandler('opt_out', opt_out),
-        CommandHandler('get_karma', get_karma),
         MessageHandler(Filters.all, save),  # must be last
     ]
 
