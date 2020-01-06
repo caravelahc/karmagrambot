@@ -185,7 +185,7 @@ def run():
     handlers = HANDLERS + [
         CommandHandler('opt_in', opt_in),
         CommandHandler('opt_out', opt_out),
-        MessageHandler(Filters.all, save),  # must be last
+        MessageHandler(Filters.all, save, edited_updates=True),  # must be last
     ]
 
     for h in handlers:
