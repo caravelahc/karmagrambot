@@ -61,10 +61,8 @@ def karma(_: Bot, update: Update):
 
     user_karma = analytics.get_karma(user_info.user_id, message.chat_id, period)
 
-    reply_msg = f'{user_info.username} has {user_karma} karma in this chat'
-    reply_msg += f' (since {period}).' if period is not None else f' (all time).'
-
-    message.reply_text(reply_msg)
+    period_suffix = f'(since {period})' if period is not None else f'(all time)'
+    message.reply_text(f'{user_info.username} has {user_karma} karma in this chat {period_suffix}.')
 
 
 def karmas(_: Bot, update: Update):
@@ -79,10 +77,13 @@ def karmas(_: Bot, update: Update):
     """
     text = update.message.text
     _, *args = text.split()
-    arg = args[0].lstrip('-') if args else None
-    period = get_period('m')
-    if arg in ('w', 'week', 'y', 'year', 'all', 'alltime'):
-        period = get_period(arg)
+    arg = args[0] if args else 'm'
+    requested_period = arg.lstrip('-')
+    if requested_period not in ('m', 'month', 'w', 'week', 'y', 'year', 'all', 'alltime'):
+        update.message.reply_text(f'Period {requested_period} is not supported.')
+        return
+
+    period = get_period(arg)
 
     top_users = analytics.get_top_n_karmas(update.message.chat.id, 10, period)
 

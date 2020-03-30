@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Optional
 from datetime import date
 import dataset
 
@@ -31,7 +31,7 @@ def average_message_length(user_id: int, chat_id: int) -> float:
     return sum(m['length'] for m in messages) / len(messages)
 
 
-def get_karma(user_id: int, chat_id: int, period: date = None) -> int:
+def get_karma(user_id: int, chat_id: int, period: Optional[date] = None) -> int:
     """Get the karma of an given user in a given chat.
 
     Args:
@@ -54,7 +54,7 @@ def get_karma(user_id: int, chat_id: int, period: date = None) -> int:
     return votes['+'] - votes['-']
 
 
-def get_top_n_karmas(chat_id: int, n: int, period: date = None) -> List[UserKarma]:
+def get_top_n_karmas(chat_id: int, n: int, period: Optional[date] = None) -> List[UserKarma]:
     """Get the top n karmas in a given group, if the doesn't have enough users, return the total amount.
     Args:
         chat_id: The id of the chat that we're interested in.
