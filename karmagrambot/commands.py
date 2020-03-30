@@ -6,7 +6,7 @@ import dataset
 
 from . import analytics
 from .config import DB_URI
-from .util import user_info_from_message_or_reply, user_info_from_username
+from .util import user_info_from_message_or_reply, user_info_from_username, get_period
 
 
 def average_length(_: Bot, update: Update):
@@ -39,7 +39,15 @@ def karma(_: Bot, update: Update):
 
     _, *args = text.split()
 
-    username = args[0].lstrip('@') if args else None
+    username = None
+    period = get_period('m')
+    if args:
+        for arg in args:
+            arg = arg.lstrip('-')
+            if arg in ('w', 'week', 'y', 'year', 'all', 'alltime'):
+                period = get_period(arg)
+            elif arg != 'm':
+                username = arg.lstrip('@')
 
     user_info = (
         user_info_from_message_or_reply(message)
@@ -51,9 +59,10 @@ def karma(_: Bot, update: Update):
         message.reply_text(f'Could not find user named {username}')
         return
 
-    user_karma = analytics.get_karma(user_info.user_id, message.chat_id)
+    user_karma = analytics.get_karma(user_info.user_id, message.chat_id, period)
 
-    message.reply_text(f'{user_info.username} has {user_karma} karma in this chat')
+    period_suffix = f'(since {period})' if period is not None else f'(all time)'
+    message.reply_text(f'{user_info.username} has {user_karma} karma in this chat {period_suffix}.')
 
 
 def karmas(_: Bot, update: Update):
@@ -66,7 +75,17 @@ def karmas(_: Bot, update: Update):
         bot: The object that represents the Telegram Bot.
         update: The object that represents an incoming update for the bot to handle.
     """
-    top_users = analytics.get_top_n_karmas(update.message.chat.id, 10)
+    text = update.message.text
+    _, *args = text.split()
+    arg = args[0] if args else 'm'
+    requested_period = arg.lstrip('-')
+    if requested_period not in ('m', 'month', 'w', 'week', 'y', 'year', 'all', 'alltime'):
+        update.message.reply_text(f'Period {requested_period} is not supported.')
+        return
+
+    period = get_period(arg)
+
+    top_users = analytics.get_top_n_karmas(update.message.chat.id, 10, period)
 
     response = '\n'.join(
         f'{i} - {user.name} ({user.karma})' for i, user in enumerate(top_users, 1)

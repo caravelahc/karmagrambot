@@ -1,5 +1,7 @@
 """Utility module."""
 from typing import NamedTuple, Optional
+from datetime import date
+from calendar import monthrange
 
 from telegram import Message
 
@@ -52,3 +54,19 @@ def user_info_from_username(db, username) -> Optional[UserInfo]:
     user_id = user['user_id']
 
     return UserInfo(user_id, username)
+
+
+def get_period(arg_period: str) -> Optional[date]:
+    today = date.today()
+    if arg_period in ('m', 'month'):
+        timestamp = today.replace(day=1)
+    elif arg_period in ('y', 'year'):
+        timestamp = today.replace(day=1, month=1)
+    elif arg_period in ('w', 'week'):
+        last_month = today.month
+        days_last_month = monthrange(today.year, today.month)[1]
+        timestamp = today.replace(day=(today.day-7)%days_last_month, month=last_month)
+    else:
+        return None
+    
+    return timestamp
