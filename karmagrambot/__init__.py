@@ -174,6 +174,10 @@ def opt_out(_, update):
 
     db = dataset.connect(DB_URI)
 
+    if not is_tracked(chat_id, user_id, db):
+        message.reply_text(u'You are not being tracked in this chat \U0001F914')
+        return
+
     track(chat_id, user_id, False, db)
 
     message.reply_text(u'You are no longer being tracked in this chat \U0001F64B')
