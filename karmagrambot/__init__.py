@@ -155,15 +155,15 @@ def opt_in(_, update):
     db = dataset.connect(DB_URI)
 
     if is_tracked(chat_id, user_id, db):
-        message.reply_text('You are already being tracked in this chat.')
+        message.reply_text(u'You are already being tracked in this chat \U0001F600')
         return
 
     track(chat_id, user_id, True, db)
 
     message.reply_text(
-        'You are now being tracked in this chat. '
+        u'You are now being tracked in this chat. '
         'Worry not, the contents of your messages are not saved, '
-        'only their length ;)'
+        'only their length \U00002713'
     )
 
 
@@ -176,8 +176,7 @@ def opt_out(_, update):
 
     track(chat_id, user_id, False, db)
 
-    message.reply_text('You are no longer being tracked in this chat ;)')
-
+    message.reply_text(u'You are no longer being tracked in this chat \U0001F64B')
 
 def run():
     updater = Updater(TOKEN)
