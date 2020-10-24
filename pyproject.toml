@@ -30,3 +30,98 @@ skip_string_normalization = true
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.pylint]
+    [tool.pylint.MASTER]
+    ignore = "CVS"
+    persistent = "yes"
+    load-plugins = "pylint_quotes"
+    string-quote = "single"
+    triple-quote = "double"
+    docstring-quote = "double"
+
+    [tool.pylint.'MESSAGES CONTROL']
+    disable = [
+        "locally-disabled",
+        "too-many-return-statements",
+    ]
+
+    [tool.pylint.REFACTORING]
+    max-nested-blocks = 5
+
+    [tool.pylint.MISCELLANEOUS]
+    notes = [
+        'FIXME',
+        'XXX',
+        'TODO',
+    ]
+
+    [tool.pylint.TYPECHECK]
+    contextmanager-decorators = [
+        'contextlib',
+        'contextmanager',
+    ]
+    ignore-mixin-members = 'yes'
+    ignore-on-opaque-inference = 'yes'
+    ignored-classes = [
+        'optparse.Values',
+        'thread._local',
+        '_thread._local',
+    ]
+    missing-member-hint = 'yes'
+    missing-member-hint-distance = 1
+    missing-member-max-choices = 1
+
+
+    [tool.pylint.REPORTS]
+    output-format = "text"
+    files-output = "no"
+    reports = "yes"
+
+    [tool.pylint.'LOGGING']
+    logging-modules = 'logging'
+
+    [tool.pylint.VARIABLES]
+    allow-global-unused-variables = 'yes'
+    callbacks = [
+        'cb_',
+        '_cb',
+    ]
+    dummy-variables-rgx = '_+$|(_[a-zA-Z0-9_]*[a-zA-Z0-9]+?$)|dummy|^ignored_|^unused_'
+    ignored-argument-names ='_.*|^ignored_|^unused_'
+    init-import = 'no'
+    redefining-builtins-modules = [
+        "six.moves",
+        "future.builtins",
+    ]
+
+    [tool.pylint.SIMILARITIES]
+    ignore-comments = 'yes'
+    ignore-docstrings = 'yes'
+    ignore-imports = 'no'
+    min-similarity-lines = 4
+
+    [tool.pylint.SPELLING]
+    spelling-store-unknown-words = 'no'
+
+    [tool.pylint.IMPORTS]
+    deprecated-modules = "optparse"
+
+    [tool.pylint.CLASSES]
+    defining-attr-methods = [
+        "__init__",
+        "__new__",
+        "setUp",
+    ]
+    valid-classmethod-first-arg = "cls"
+    valid-metaclass-classmethod-first-arg = "mcs"
+    exclude-protected = [
+        "_asdict",
+        "_fields",
+        "_replace",
+        "_source",
+        "_make",
+    ]
+
+    [tool.pylint.EXCEPTIONS]
+    overgeneral-exceptions = "Exception"
