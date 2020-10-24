@@ -20,7 +20,9 @@ def format(c):
 
 @task
 def format_check(c):
-    check_all([
-        c.run('black --check -q karmagrambot', warn=True),
-        c.run('isort -rc -c -q karmagrambot', warn=True),
-    ])
+    check_all(
+        [
+            c.run('black --check -q karmagrambot', warn=True),
+            c.run('isort -rc -c -q karmagrambot', warn=True),
+        ]
+    )
