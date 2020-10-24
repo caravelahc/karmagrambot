@@ -19,12 +19,9 @@ def average_message_length(user_id: int, chat_id: int) -> float:
     """
 
     db = dataset.connect(DB_URI)
-    messages = list(db['messages'].find(
-        user_id=user_id,
-        chat_id=chat_id,
-        vote=None,
-        length={'not': None}
-    ))
+    messages = list(
+        db['messages'].find(user_id=user_id, chat_id=chat_id, vote=None, length={'not': None})
+    )
 
     if not messages:
         return 0
@@ -46,9 +43,18 @@ def get_karma(user_id: int, chat_id: int, period: Optional[date] = None) -> int:
     db = dataset.connect(DB_URI)
 
     if timestamp is None:
-        result = db.query('select vote, count(1) as num from messages where vote is not null and chat_id = :chat_id and replied in (select message_id from messages where user_id = :user_id and chat_id = :chat_id) group by vote;', user_id=user_id, chat_id=chat_id)
+        result = db.query(
+            'select vote, count(1) as num from messages where vote is not null and chat_id = :chat_id and replied in (select message_id from messages where user_id = :user_id and chat_id = :chat_id) group by vote;',
+            user_id=user_id,
+            chat_id=chat_id,
+        )
     else:
-        result = db.query('select vote, count(1) as num from messages where vote is not null and chat_id = :chat_id and date(timestamp) > :timestamp and replied in (select message_id from messages where user_id = :user_id and chat_id = :chat_id) group by vote;', user_id=user_id, chat_id=chat_id, timestamp=timestamp)
+        result = db.query(
+            'select vote, count(1) as num from messages where vote is not null and chat_id = :chat_id and date(timestamp) > :timestamp and replied in (select message_id from messages where user_id = :user_id and chat_id = :chat_id) group by vote;',
+            user_id=user_id,
+            chat_id=chat_id,
+            timestamp=timestamp,
+        )
 
     votes = defaultdict(lambda: 0, (x.values() for x in result))
 
@@ -67,9 +73,7 @@ def get_top_n_karmas(chat_id: int, n: int, period: Optional[date] = None) -> Lis
     users = db['tracked'].distinct('user_id', chat_id=chat_id)
     user_ids = [u['user_id'] for u in users]
 
-    sorted_user_ids = sorted(
-        user_ids, key=lambda u: get_karma(u, chat_id, period), reverse=True
-    )
+    sorted_user_ids = sorted(user_ids, key=lambda u: get_karma(u, chat_id, period), reverse=True)
 
     sorted_users = []
     for user_id in sorted_user_ids:

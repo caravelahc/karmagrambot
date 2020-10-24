@@ -16,9 +16,7 @@ def average_length(_: Bot, update: Update):
         update: The object that represents an incoming update for the bot to handle.
     """
 
-    average = analytics.average_message_length(
-        update.message.from_user.id, update.message.chat.id
-    )
+    average = analytics.average_message_length(update.message.from_user.id, update.message.chat.id)
     response = f'{average:.3}'
 
     update.message.reply_text(response)
@@ -78,7 +76,7 @@ def karmas(_: Bot, update: Update):
     _, *args = text.split()
     arg = args[0] if args else 'm'
     requested_period = arg.lstrip('-')
-    if requested_period not in ('m', 'month', 'w', 'week', 'y', 'year', 'all', 'alltime'):
+    if requested_period not in ('m', 'month', 'w', 'week', 'y', 'year', 'all', 'alltime',):
         update.message.reply_text(f'Period {requested_period} is not supported.')
         return
 
@@ -86,9 +84,7 @@ def karmas(_: Bot, update: Update):
 
     top_users = analytics.get_top_n_karmas(update.message.chat.id, 10, period)
 
-    response = '\n'.join(
-        f'{i} - {user.name} ({user.karma})' for i, user in enumerate(top_users, 1)
-    )
+    response = '\n'.join(f'{i} - {user.name} ({user.karma})' for i, user in enumerate(top_users, 1))
 
     update.message.reply_text(response)
 
