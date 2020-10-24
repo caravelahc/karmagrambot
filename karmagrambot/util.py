@@ -1,7 +1,7 @@
 """Utility module."""
-from typing import NamedTuple, Optional
-from datetime import date
 from calendar import monthrange
+from datetime import date
+from typing import NamedTuple, Optional
 
 from telegram import Message
 

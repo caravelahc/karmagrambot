@@ -1,12 +1,11 @@
 """Aggregate every user-available command."""
+import dataset
 from telegram import Bot, Update
 from telegram.ext import CommandHandler
 
-import dataset
-
 from . import analytics
 from .config import DB_URI
-from .util import user_info_from_message_or_reply, user_info_from_username, get_period
+from .util import get_period, user_info_from_message_or_reply, user_info_from_username
 
 
 def average_length(_: Bot, update: Update):
