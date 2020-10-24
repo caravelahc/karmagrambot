@@ -15,7 +15,7 @@ mypy = "^0.740.0"
 [tool.poetry.dev-dependencies]
 flake8 = "^3.7"
 jedi = "^0.13.2"
-pylint = "^2.3"
+pylint = "^2.6"
 pylint_quotes = "^0.2.1"
 isort = "^4.3"
 invoke = "^1.2"
