@@ -10,11 +10,11 @@ license = "MIT"
 python = "^3.7"
 python-telegram-bot = "^11.1"
 dataset = "^1.1"
-mypy = "^0.740.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.7"
 jedi = "^0.13.2"
+mypy = "^0.740.0"
 pylint = "^2.6"
 pylint-fail-under = "^0.3.0"
 pylint_quotes = "^0.2.1"
