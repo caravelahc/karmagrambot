@@ -1,6 +1,7 @@
 from collections import defaultdict
-from typing import Dict, List, Optional
 from datetime import date
+from typing import Dict, List, Optional
+
 import dataset
 
 from .config import DB_URI
