@@ -67,12 +67,9 @@ def get_message_text(message: Message) -> Optional[str]:
 
     return None
 
+
 def get_message_info(message: Message) -> MessageInfo:
-    replied = (
-        message.reply_to_message.message_id
-        if message.reply_to_message is not None
-        else None
-    )
+    replied = message.reply_to_message.message_id if message.reply_to_message is not None else None
 
     text = get_message_text(message)
 
@@ -82,11 +79,7 @@ def get_message_info(message: Message) -> MessageInfo:
     length = len(text)
     vote = get_vote(text)
 
-    return MessageInfo(
-        replied=replied,
-        length=length,
-        vote=vote
-    )
+    return MessageInfo(replied=replied, length=length, vote=vote)
 
 
 def save_message(message, db):
