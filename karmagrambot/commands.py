@@ -118,6 +118,28 @@ def saint(_: Bot, update: Update):
 
     update.message.reply_text(response)
 
+def help(_: Bot, update: Update):
+    """Shows the commands that can be used with the bot.
+
+    Args:
+        bot: The object that represents the Telegram Bot.
+        update: The object that represents an incoming update for the bot to handle.
+    """
+
+    response = f"""
+                Karma is obtained through replying messages with + or -
+
+                The following commands are available:
+
+                \\average_length - informs your average message length.
+                \\karma - informs your respective karma.
+                \\karmas - shows the top 10 karmas in a given group.
+                \\devil - replies the user informing who is the person with the lowest karma.
+                \\saint - replies the user informing who is the person with the highest karma.
+                """
+
+    update.message.reply_text(response)
+
 
 HANDLERS = [
     CommandHandler('average_length', average_length),
