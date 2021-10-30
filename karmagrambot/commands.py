@@ -1,4 +1,6 @@
 """Aggregate every user-available command."""
+from textwrap import dedent
+
 import dataset
 from telegram import Bot, Update
 from telegram.ext import CommandHandler
@@ -118,7 +120,7 @@ def saint(_: Bot, update: Update):
 
     update.message.reply_text(response)
 
-def help(_: Bot, update: Update):
+def help_message(_: Bot, update: Update):
     """Shows the commands that can be used with the bot.
 
     Args:
@@ -126,17 +128,17 @@ def help(_: Bot, update: Update):
         update: The object that represents an incoming update for the bot to handle.
     """
 
-    response = f"""
-                Karma is obtained through replying messages with + or -
+    response = dedent(f"""
+                Karma is obtained through replying messages with one or more + or -.
 
                 The following commands are available:
 
-                \\average_length - informs your average message length.
-                \\karma - informs your respective karma.
-                \\karmas - shows the top 10 karmas in a given group.
-                \\devil - replies the user informing who is the person with the lowest karma.
-                \\saint - replies the user informing who is the person with the highest karma.
-                """
+                /average_length - informs your average message length.
+                /karma - informs your respective karma.
+                /karmas - shows the top 10 karmas in a given group.
+                /devil - replies the user informing who is the person with the lowest karma.
+                /saint - replies the user informing who is the person with the highest karma.
+                """)
 
     update.message.reply_text(response)
 
@@ -147,4 +149,5 @@ HANDLERS = [
     CommandHandler('karmas', karmas),
     CommandHandler('devil', devil),
     CommandHandler('saint', saint),
+    CommandHandler('help', help_message),
 ]
