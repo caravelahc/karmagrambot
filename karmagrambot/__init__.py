@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional
 
 import dataset
 from telegram import Message
@@ -68,6 +68,7 @@ def get_message_text(message: Message) -> Optional[str]:
 
     return None
 
+
 def get_message_info(message: Message) -> MessageInfo:
     replied = (
         message.reply_to_message.message_id
@@ -83,11 +84,7 @@ def get_message_info(message: Message) -> MessageInfo:
     length = len(text)
     vote = get_vote(text)
 
-    return MessageInfo(
-        replied=replied,
-        length=length,
-        vote=vote
-    )
+    return MessageInfo(replied=replied, length=length, vote=vote)
 
 
 def save_message(message, db):
@@ -180,6 +177,7 @@ def opt_out(_, update):
         track(chat_id, user_id, False, db)
 
     message.reply_text(u'You are no longer being tracked in this chat \U0001F64B')
+
 
 def run():
     updater = Updater(TOKEN)
