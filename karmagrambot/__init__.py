@@ -136,6 +136,7 @@ def save(_, update):
     db = dataset.connect(DB_URI)
     save_message(update.message, db)
     save_user(update.message.from_user, db)
+    db.close()
 
 
 def track(chat_id, user_id, value, db):
@@ -160,6 +161,8 @@ def opt_in(_, update):
 
     track(chat_id, user_id, True, db)
 
+    db.close()
+
     message.reply_text(
         u'You are now being tracked in this chat. '
         'Worry not, the contents of your messages are not saved, '
@@ -179,6 +182,8 @@ def opt_out(_, update):
         return
 
     track(chat_id, user_id, False, db)
+
+    db.close()
 
     message.reply_text(u'You are no longer being tracked in this chat \U0001F64B')
 

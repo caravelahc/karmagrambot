@@ -33,8 +33,6 @@ def karma(_: Bot, update: Update):
         bot: The object that represents the Telegram Bot.
         update: The object that represents an incoming update for the bot to handle.
     """
-    db = dataset.connect(DB_URI)
-
     message = update.message
     text = message.text
 
@@ -50,11 +48,15 @@ def karma(_: Bot, update: Update):
             elif arg != 'm':
                 username = arg.lstrip('@')
 
+    db = dataset.connect(DB_URI)
+
     user_info = (
         user_info_from_message_or_reply(message)
         if username is None
         else user_info_from_username(db, username)
     )
+
+    db.close()
 
     if user_info is None:
         message.reply_text(f'Could not find user named {username}')

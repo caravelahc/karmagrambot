@@ -25,6 +25,7 @@ def average_message_length(user_id: int, chat_id: int) -> float:
         vote=None,
         length={'not': None}
     ))
+    db.close()
 
     if not messages:
         return 0
@@ -51,6 +52,7 @@ def get_karma(user_id: int, chat_id: int, period: Optional[date] = None) -> int:
         result = db.query('select vote, count(1) as num from messages where vote is not null and chat_id = :chat_id and date(timestamp) > :timestamp and replied in (select message_id from messages where user_id = :user_id and chat_id = :chat_id) group by vote;', user_id=user_id, chat_id=chat_id, timestamp=timestamp)
 
     votes = defaultdict(lambda: 0, (x.values() for x in result))
+    db.close()
 
     return votes['+'] - votes['-']
 
@@ -80,6 +82,8 @@ def get_top_n_karmas(chat_id: int, n: int, period: Optional[date] = None) -> Lis
         user = UserKarma(name, get_karma(user_id, chat_id, period))
 
         sorted_users.append(user)
+
+    db.close()
 
     top_n = sorted_users[:n]
 
@@ -111,6 +115,8 @@ def get_devil_saint(chat_id: int) -> DevilSaint:
         UserKarma(user_name(*devil), get_karma(devil_id, chat_id)),
         UserKarma(user_name(*saint), get_karma(saint_id, chat_id)),
     )
+
+    db.close()
 
     return devil_saint
 
