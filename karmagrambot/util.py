@@ -1,7 +1,10 @@
 """Utility module."""
 from calendar import monthrange
+from contextlib import contextmanager
 from datetime import date
-from typing import NamedTuple, Optional
+from typing import Iterator, NamedTuple, Optional
+
+import dataset
 
 from telegram import Message
 
@@ -70,3 +73,10 @@ def get_period(arg_period: str) -> Optional[date]:
         return None
     
     return timestamp
+
+
+@contextmanager
+def open_database(uri: str) -> Iterator[dataset.Database]:
+    db = dataset.connect(uri)
+    yield db
+    db.close()

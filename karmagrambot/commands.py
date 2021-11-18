@@ -1,13 +1,17 @@
 """Aggregate every user-available command."""
 from textwrap import dedent
 
-import dataset
 from telegram import Bot, Update
 from telegram.ext import CommandHandler
 
 from . import analytics
 from .config import DB_URI
-from .util import get_period, user_info_from_message_or_reply, user_info_from_username
+from .util import (
+    get_period,
+    user_info_from_message_or_reply,
+    user_info_from_username,
+    open_database,
+)
 
 
 def average_length(_: Bot, update: Update):
@@ -48,15 +52,12 @@ def karma(_: Bot, update: Update):
             elif arg != 'm':
                 username = arg.lstrip('@')
 
-    db = dataset.connect(DB_URI)
-
-    user_info = (
-        user_info_from_message_or_reply(message)
-        if username is None
-        else user_info_from_username(db, username)
-    )
-
-    db.close()
+    with open_database(DB_URI) as db:
+        user_info = (
+            user_info_from_message_or_reply(message)
+            if username is None
+            else user_info_from_username(db, username)
+        )
 
     if user_info is None:
         message.reply_text(f'Could not find user named {username}')

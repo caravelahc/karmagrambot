@@ -8,6 +8,7 @@ from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 
 from .commands import HANDLERS
 from .config import DB_URI, TOKEN
+from .util import open_database
 
 logging.basicConfig()
 
@@ -133,10 +134,9 @@ def save_user(user, db):
 
 
 def save(_, update):
-    db = dataset.connect(DB_URI)
-    save_message(update.message, db)
-    save_user(update.message.from_user, db)
-    db.close()
+    with open_database(DB_URI) as db:
+        save_message(update.message, db)
+        save_user(update.message.from_user, db)
 
 
 def track(chat_id, user_id, value, db):
@@ -153,15 +153,12 @@ def opt_in(_, update):
     chat_id = message.chat_id
     user_id = message.from_user.id
 
-    db = dataset.connect(DB_URI)
+    with open_database(DB_URI) as db:
+        if is_tracked(chat_id, user_id, db):
+            message.reply_text(u'You are already being tracked in this chat \U0001F600')
+            return
 
-    if is_tracked(chat_id, user_id, db):
-        message.reply_text(u'You are already being tracked in this chat \U0001F600')
-        return
-
-    track(chat_id, user_id, True, db)
-
-    db.close()
+        track(chat_id, user_id, True, db)
 
     message.reply_text(
         u'You are now being tracked in this chat. '
@@ -175,15 +172,12 @@ def opt_out(_, update):
     chat_id = message.chat_id
     user_id = message.from_user.id
 
-    db = dataset.connect(DB_URI)
+    with open_database(DB_URI) as db:
+        if not is_tracked(chat_id, user_id, db):
+            message.reply_text(u'You are not being tracked in this chat \U0001F914')
+            return
 
-    if not is_tracked(chat_id, user_id, db):
-        message.reply_text(u'You are not being tracked in this chat \U0001F914')
-        return
-
-    track(chat_id, user_id, False, db)
-
-    db.close()
+        track(chat_id, user_id, False, db)
 
     message.reply_text(u'You are no longer being tracked in this chat \U0001F64B')
 
