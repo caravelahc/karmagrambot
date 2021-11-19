@@ -1,13 +1,17 @@
 """Utility module."""
 from calendar import monthrange
+from contextlib import contextmanager
 from datetime import date
-from typing import NamedTuple, Optional
+from typing import Iterator, NamedTuple, Optional
+
+import dataset
 
 from telegram import Message
 
 
 class UserInfo(NamedTuple):
     """Utility class to aggregate user information."""
+
     user_id: int
     username: str
 
@@ -25,9 +29,7 @@ def user_info_from_message_or_reply(message: Message) -> UserInfo:
         The information on the target message.
     """
     target_message = (
-        message.reply_to_message
-        if message.reply_to_message is not None
-        else message
+        message.reply_to_message if message.reply_to_message is not None else message
     )
 
     user_id = target_message.from_user.id
@@ -65,8 +67,17 @@ def get_period(arg_period: str) -> Optional[date]:
     elif arg_period in ('w', 'week'):
         last_month = today.month
         days_last_month = monthrange(today.year, today.month)[1]
-        timestamp = today.replace(day=(today.day-7)%days_last_month, month=last_month)
+        timestamp = today.replace(
+            day=(today.day - 7) % days_last_month, month=last_month
+        )
     else:
         return None
-    
+
     return timestamp
+
+
+@contextmanager
+def open_database(uri: str) -> Iterator[dataset.Database]:
+    db = dataset.connect(uri)
+    yield db
+    db.close()

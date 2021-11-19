@@ -1,13 +1,17 @@
 """Aggregate every user-available command."""
 from textwrap import dedent
 
-import dataset
 from telegram import Bot, Update
 from telegram.ext import CommandHandler
 
 from . import analytics
 from .config import DB_URI
-from .util import get_period, user_info_from_message_or_reply, user_info_from_username
+from .util import (
+    get_period,
+    user_info_from_message_or_reply,
+    user_info_from_username,
+    open_database,
+)
 
 
 def average_length(_: Bot, update: Update):
@@ -33,8 +37,6 @@ def karma(_: Bot, update: Update):
         bot: The object that represents the Telegram Bot.
         update: The object that represents an incoming update for the bot to handle.
     """
-    db = dataset.connect(DB_URI)
-
     message = update.message
     text = message.text
 
@@ -50,11 +52,12 @@ def karma(_: Bot, update: Update):
             elif arg != 'm':
                 username = arg.lstrip('@')
 
-    user_info = (
-        user_info_from_message_or_reply(message)
-        if username is None
-        else user_info_from_username(db, username)
-    )
+    with open_database(DB_URI) as db:
+        user_info = (
+            user_info_from_message_or_reply(message)
+            if username is None
+            else user_info_from_username(db, username)
+        )
 
     if user_info is None:
         message.reply_text(f'Could not find user named {username}')
@@ -62,8 +65,10 @@ def karma(_: Bot, update: Update):
 
     user_karma = analytics.get_karma(user_info.user_id, message.chat_id, period)
 
-    period_suffix = f'(since {period})' if period is not None else f'(all time)'
-    message.reply_text(f'{user_info.username} has {user_karma} karma in this chat {period_suffix}.')
+    period_suffix = f'(since {period})' if period is not None else '(all time)'
+    message.reply_text(
+        f'{user_info.username} has {user_karma} karma in this chat {period_suffix}.'
+    )
 
 
 def karmas(_: Bot, update: Update):
@@ -80,7 +85,16 @@ def karmas(_: Bot, update: Update):
     _, *args = text.split()
     arg = args[0] if args else 'm'
     requested_period = arg.lstrip('-')
-    if requested_period not in ('m', 'month', 'w', 'week', 'y', 'year', 'all', 'alltime'):
+    if requested_period not in (
+        'm',
+        'month',
+        'w',
+        'week',
+        'y',
+        'year',
+        'all',
+        'alltime',
+    ):
         update.message.reply_text(f'Period {requested_period} is not supported.')
         return
 
@@ -103,7 +117,9 @@ def devil(_: Bot, update: Update):
         update: The object that represents an incoming update for the bot to handle.
     """
     group_devil = analytics.get_devil_saint(update.message.chat.id).devil
-    response = f"{group_devil.name}, there's a special place in hell for you, see you there."
+    response = (
+        f"{group_devil.name}, there's a special place in hell for you, see you there."
+    )
 
     update.message.reply_text(response)
 
@@ -120,6 +136,7 @@ def saint(_: Bot, update: Update):
 
     update.message.reply_text(response)
 
+
 def help_message(_: Bot, update: Update):
     """Shows the commands that can be used with the bot.
 
@@ -128,7 +145,8 @@ def help_message(_: Bot, update: Update):
         update: The object that represents an incoming update for the bot to handle.
     """
 
-    response = dedent(f"""
+    response = dedent(
+        """
                 Karma is obtained through replying messages with one or more + or -.
 
                 The following commands are available:
@@ -138,7 +156,8 @@ def help_message(_: Bot, update: Update):
                 /karmas - shows the top 10 karmas in a given group.
                 /devil - replies the user informing who is the person with the lowest karma.
                 /saint - replies the user informing who is the person with the highest karma.
-                """)
+                """
+    )
 
     update.message.reply_text(response)
 
